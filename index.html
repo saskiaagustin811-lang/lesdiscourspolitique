@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Le Petit Débat Gemoy - Français A1 (Yona Gustria)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        earth: {
+                            50: '#FDFBF7',
+                            100: '#F7F2E8',
+                            200: '#ECE2D0',
+                            300: '#DBCBAE',
+                            400: '#C7AE8B',
+                            500: '#A88B60',
+                            600: '#876943',
+                            700: '#674E31',
+                            800: '#4A3723',
+                            900: '#2E2215',
+                        },
+                        terracotta: '#D96B43',
+                        olive: '#6B8E23',
+                        sawit: '#2D5A27',
+                        clay: '#B25329'
+                    },
+                    fontFamily: {
+                        sans: ['Comic Sans MS', 'Chalkboard SE', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #F7F2E8;
+            color: #4A3723;
+            background-image: radial-gradient(#DBCBAE 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
+        /* Animation Gemoy Dance */
+        @keyframes gemoyDance {
+            0% { transform: translateY(0) rotate(0deg) scale(1); }
+            15% { transform: translateY(-12px) rotate(-8deg) scale(1.05); }
+            30% { transform: translateY(0) rotate(8deg) scale(0.95); }
+            45% { transform: translateY(-10px) rotate(-6deg) scale(1.05); }
+            60% { transform: translateY(0) rotate(6deg) scale(0.98); }
+            75% { transform: translateY(-6px) rotate(-4deg) scale(1.02); }
+            100% { transform: translateY(0) rotate(0deg) scale(1); }
+        }
+
+        /* Animation Buna Pouty */
+        @keyframes bunaPout {
+            0% { transform: scale(1) rotate(0deg); }
+            20% { transform: scale(1.08) rotate(-3deg); }
+            40% { transform: scale(0.95) rotate(3deg); }
+            60% { transform: scale(1.02) rotate(-2deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+
+        .animate-gemoy {
+            animation: gemoyDance 1.2s ease-in-out infinite;
+        }
+
+        .animate-buna {
+            animation: bunaPout 0.8s ease-in-out;
+        }
+
+        /* Custom Card styles */
+        .card-match {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-match:hover {
+            transform: translateY(-3px) scale(1.01);
+        }
+        .card-selected {
+            border-color: #D96B43 !important;
+            background-color: #FDE8E0 !important;
+            box-shadow: 0 4px 12px rgba(217, 107, 67, 0.25);
+        }
+        .card-matched {
+            border-color: #6B8E23 !important;
+            background-color: #E8F0D6 !important;
+            opacity: 0.75;
+            cursor: not-allowed;
+        }
+        .card-wrong {
+            border-color: #EF4444 !important;
+            background-color: #FEE2E2 !important;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between font-sans p-3 md:p-6">
+
+    <header class="max-w-4xl mx-auto w-full text-center mb-6">
+        <!-- Identity Badge requested: Yona Gustria (2407348) -->
+        <div class="inline-flex items-center gap-2 bg-earth-800 text-earth-100 px-5 py-2 rounded-full text-xs md:text-sm font-black border-2 border-earth-600 shadow-md mb-3">
+            <i class="fa-solid fa-graduation-cap text-yellow-400"></i>
+            <span>Yona Gustria (2407348)</span>
+            <span>•</span>
+            <span class="text-earth-300">Media Ajar Bahasa Prancis A1</span>
+        </div>
+        
+        <div class="flex items-center justify-center gap-2 text-xs md:text-sm font-bold text-earth-700 mb-2">
+            <span class="bg-earth-200 px-3 py-1 rounded-xl border border-earth-300">??? Discours & Débat</span>
+            <span>•</span>
+            <span class="bg-earth-200 px-3 py-1 rounded-xl border border-earth-300 text-terracotta">?? Sawit & MBG</span>
+        </div>
+        
+        <h1 class="text-3xl md:text-5xl font-black text-earth-900 tracking-tight flex items-center justify-center gap-3">
+            <span>Le Petit Débat Gemoy</span>
+            <span class="text-2xl">???</span>
+        </h1>
+        <p class="text-earth-700 text-xs md:text-sm mt-1 max-w-xl mx-auto">
+            Apprenons à donner notre opinion en français ! C'est facile, drôle et sans fumée de karhutla ! ????
+        </p>
+    </header>
+
+    <main class="max-w-4xl mx-auto w-full flex-grow">
+        
+        <!-- Tab Navigation Buttons -->
+        <div class="flex justify-center gap-3 mb-6">
+            <button id="btn-tab-match" onclick="switchTab('match')" class="px-5 py-2.5 rounded-2xl font-bold text-xs md:text-sm bg-terracotta text-white shadow-md transition-all flex items-center gap-2">
+                <i class="fa-solid fa-puzzle-piece"></i> 1. Apparier les Mots (Menjodohkan)
+            </button>
+            <button id="btn-tab-quiz" onclick="switchTab('quiz')" class="px-5 py-2.5 rounded-2xl font-bold text-xs md:text-sm bg-earth-200 text-earth-800 hover:bg-earth-300 transition-all flex items-center gap-2">
+                <i class="fa-solid fa-circle-question"></i> 2. Mini Quiz Débat
+            </button>
+        </div>
+
+        <!-- SECTION 1: MATCHING GAME -->
+        <div id="section-match" class="bg-earth-100 rounded-3xl p-4 md:p-8 border-2 border-earth-300 shadow-xl relative overflow-hidden">
+            <div class="absolute -right-6 -bottom-6 opacity-10 text-9xl pointer-events-none select-none">??</div>
+            
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-2">
+                <div>
+                    <h2 class="text-lg md:text-xl font-bold text-earth-900 flex items-center gap-2">
+                        <span>Associez les expressions de débat !</span>
+                    </h2>
+                    <p class="text-xs text-earth-600">Choisissez une phrase à gauche, puis trouvez son rôle à droite.</p>
+                </div>
+                <div class="bg-earth-200 px-4 py-2 rounded-xl text-xs font-bold text-earth-800 border border-earth-300">
+                    Pairs trouvés: <span id="match-score" class="text-terracotta text-sm font-black">0</span> / 6
+                </div>
+            </div>
+
+            <!-- Matching Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Left Column (French A1 Expressions) -->
+                <div class="space-y-3" id="left-column">
+                    <!-- Populated via JS -->
+                </div>
+
+                <!-- Right Column (Role/Function in simple A1 French) -->
+                <div class="space-y-3" id="right-column">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+
+            <div id="match-complete-msg" class="hidden mt-6 text-center bg-olive/20 p-4 rounded-2xl border border-olive text-earth-900 font-bold">
+                ?? Bravo ! Vous maîtrisez les expressions de débat A1 ! Passez au Mini Quiz !
+            </div>
+        </div>
+
+        <!-- SECTION 2: MINI QUIZ GAME -->
+        <div id="section-quiz" class="hidden bg-earth-100 rounded-3xl p-4 md:p-8 border-2 border-earth-300 shadow-xl relative">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h2 class="text-lg md:text-xl font-bold text-earth-900">Complétez le Discours Politico-Gemoy !</h2>
+                    <p class="text-xs text-earth-600">Choisissez la meilleure réponse en français A1.</p>
+                </div>
+                <div class="text-xs font-bold bg-earth-200 px-3 py-1.5 rounded-xl border border-earth-300">
+                    Question <span id="quiz-progress">1</span> / 4
+                </div>
+            </div>
+
+            <div id="quiz-card" class="bg-earth-50 p-5 md:p-6 rounded-2xl border border-earth-200 mb-6">
+                <!-- Question Title -->
+                <p id="quiz-question" class="text-base md:text-lg font-bold text-earth-900 mb-4">
+                    Chargement de la question...
+                </p>
+
+                <!-- Options -->
+                <div id="quiz-options" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+
+            <!-- Satirical Meme Footer inside Quiz -->
+            <div class="text-center text-xs text-earth-700 bg-earth-200/80 p-3 rounded-xl border border-earth-300 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-glass-water text-terracotta text-sm"></i>
+                <span>"Après le débat : Lait MBG gratuit pour tout le monde ! ??"</span>
+            </div>
+        </div>
+
+        <!-- REACTION MODAL (Popup for feedback) -->
+        <div id="reaction-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+            <div class="bg-earth-50 border-4 border-earth-300 rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl transform transition-all relative overflow-hidden">
+                
+                <!-- CORRECT REACTION (PRABOWO JOGET GEMOY) -->
+                <div id="reaction-correct" class="hidden space-y-4">
+                    <div class="relative inline-block">
+                        <!-- Cartoon Avatar Gemoy (SVG Custom Art) -->
+                        <div class="w-36 h-36 mx-auto animate-gemoy">
+                            <svg viewBox="0 0 200 200" class="w-full h-full drop-shadow-md">
+                                <!-- Cap/Peci -->
+                                <path d="M 60 70 Q 100 50 140 70 L 145 85 Q 100 80 55 85 Z" fill="#2E2215"/>
+                                <!-- Head -->
+                                <circle cx="100" cy="110" r="45" fill="#FAD6A5"/>
+                                <!-- Ears -->
+                                <circle cx="52" cy="110" r="10" fill="#FAD6A5"/>
+                                <circle cx="148" cy="110" r="10" fill="#FAD6A5"/>
+                                <!-- Cheeks Gemoy -->
+                                <circle cx="75" cy="120" r="8" fill="#FF8B8B" opacity="0.6"/>
+                                <circle cx="125" cy="120" r="8" fill="#FF8B8B" opacity="0.6"/>
+                                <!-- Eyes Happy -->
+                                <path d="M 75 100 Q 82 90 89 100" stroke="#2E2215" stroke-width="4" fill="none" stroke-linecap="round"/>
+                                <path d="M 111 100 Q 118 90 125 100" stroke="#2E2215" stroke-width="4" fill="none" stroke-linecap="round"/>
+                                <!-- Big Gemoy Smile -->
+                                <path d="M 80 125 Q 100 145 120 125" stroke="#2E2215" stroke-width="4" fill="#876943" stroke-linecap="round"/>
+                                <!-- Safari Jacket -->
+                                <path d="M 50 155 Q 100 145 150 155 L 160 200 L 40 200 Z" fill="#9CA3AF"/>
+                                <!-- Tie / Collar -->
+                                <polygon points="100,155 90,190 100,200 110,190" fill="#2E2215"/>
+                                <!-- Dancing Hands -->
+                                <circle cx="35" cy="140" r="12" fill="#FAD6A5"/>
+                                <circle cx="165" cy="140" r="12" fill="#FAD6A5"/>
+                            </svg>
+                        </div>
+                        <span class="absolute -top-2 -right-2 bg-yellow-400 text-xs font-black px-2.5 py-1 rounded-full border border-earth-800 rotate-12">
+                            GEMOY DANCE! ??
+                        </span>
+                    </div>
+
+                    <h3 class="text-2xl font-black text-olive">C'est Exact ! ??</h3>
+                    <p id="correct-subtext" class="text-xs text-earth-700 bg-earth-200/80 p-3 rounded-xl border border-earth-300">
+                        "Très bien ! Le président danse le Gemoy de joie ! Vous gagnez une brique de lait MBG ??!"
+                    </p>
+                    <button onclick="closeModal()" class="w-full py-3 bg-olive text-white rounded-2xl font-bold shadow-lg hover:bg-olive/90 transition-all">
+                        Continuer ??
+                    </button>
+                </div>
+
+                <!-- INCORRECT REACTION (BUNA TEDDY CEMBERUT) -->
+                <div id="reaction-wrong" class="hidden space-y-4">
+                    <div class="relative inline-block">
+                        <!-- Cartoon Buna Teddy Pouting Avatar (SVG Custom) -->
+                        <div class="w-36 h-36 mx-auto animate-buna">
+                            <svg viewBox="0 0 200 200" class="w-full h-full drop-shadow-md">
+                                <!-- Bear Ears -->
+                                <circle cx="55" cy="65" r="22" fill="#876943"/>
+                                <circle cx="55" cy="65" r="12" fill="#C7AE8B"/>
+                                <circle cx="145" cy="65" r="22" fill="#876943"/>
+                                <circle cx="145" cy="65" r="12" fill="#C7AE8B"/>
+                                <!-- Head -->
+                                <circle cx="100" cy="110" r="50" fill="#A88B60"/>
+                                <!-- Snout -->
+                                <ellipse cx="100" cy="122" rx="22" ry="16" fill="#ECE2D0"/>
+                                <ellipse cx="100" cy="115" rx="8" ry="6" fill="#2E2215"/>
+                                <!-- Angry/Pouting Eyebrows -->
+                                <path d="M 65 88 L 85 96" stroke="#2E2215" stroke-width="4" stroke-linecap="round"/>
+                                <path d="M 135 88 L 115 96" stroke="#2E2215" stroke-width="4" stroke-linecap="round"/>
+                                <!-- Eyes Disappointed -->
+                                <circle cx="75" cy="102" r="5" fill="#2E2215"/>
+                                <circle cx="125" cy="102" r="5" fill="#2E2215"/>
+                                <!-- Pouting Mouth -->
+                                <path d="M 88 132 Q 100 122 112 132" stroke="#2E2215" stroke-width="4" fill="none" stroke-linecap="round"/>
+                                <!-- Blushing Angry -->
+                                <circle cx="65" cy="118" r="6" fill="#EF4444" opacity="0.5"/>
+                                <circle cx="135" cy="118" r="6" fill="#EF4444" opacity="0.5"/>
+                            </svg>
+                        </div>
+                        <span class="absolute -top-2 -right-2 bg-clay text-white text-xs font-black px-2 py-1 rounded-full border border-earth-800 -rotate-12">
+                            BUNA CEMBERUT ??
+                        </span>
+                    </div>
+
+                    <h3 class="text-2xl font-black text-clay">Oh non ! Pas encore !</h3>
+                    <p class="text-xs text-earth-700 bg-earth-200/80 p-3 rounded-xl border border-earth-300">
+                        "Buna Teddy cemberut melihat réponse ceci... Pas de panique, réessayez pour avoir du lait MBG !"
+                    </p>
+                    <button onclick="closeModal()" class="w-full py-3 bg-terracotta text-white rounded-2xl font-bold shadow-lg hover:bg-terracotta/90 transition-all">
+                        Réessayer ??
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- FINAL SUMMARY MODAL -->
+        <div id="final-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+            <div class="bg-earth-50 border-4 border-earth-400 rounded-3xl p-6 md:p-8 max-w-lg w-full text-center shadow-2xl space-y-5">
+                <div class="text-5xl">??????</div>
+                <h2 class="text-3xl font-black text-earth-900">Félicitations !</h2>
+                <p class="text-xs md:text-sm text-earth-700">Vous avez réussi la leçon de français A1 : <b>Le Débat Politique Gemoy !</b></p>
+                
+                <!-- Satirical Certificate Card -->
+                <div class="bg-earth-100 border-2 border-dashed border-earth-400 p-4 rounded-2xl text-left space-y-2 text-xs text-earth-800">
+                    <p class="font-bold text-sm text-terracotta flex items-center justify-between">
+                        <span>?? Certificat Délégué A1</span>
+                        <span class="text-earth-600 font-mono text-xs">By Yona Gustria (2407348)</span>
+                    </p>
+                    <hr class="border-earth-300">
+                    <p>?? Vous savez exprimer votre opinion (<i>"Je pense que...", "À mon avis..."</i>).</p>
+                    <p>?? Bon d'abonnement : <b>Lait MBG Gratuit</b> pendant 5 ans ! ??</p>
+                    <p>?? Bonus : <b>1 Hectare de Plantation de Sawit</b> ?? *(Garantie 0% fumée de Karhutla!)*</p>
+                </div>
+
+                <!-- Satirical Quote -->
+                <p class="italic text-xs text-earth-600 bg-earth-200 p-2.5 rounded-xl border border-earth-300">
+                    "Merci pour votre attention ! Pas besoin de longs discours, l'important c'est de bien manger !" 
+                </p>
+
+                <button onclick="restartAll()" class="w-full py-3.5 bg-earth-800 text-earth-100 rounded-2xl font-bold hover:bg-earth-900 transition-all shadow-md">
+                    Recommencer la Leçon ??
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="max-w-4xl mx-auto w-full text-center mt-8 pt-4 border-t border-earth-300 text-xs text-earth-600 space-y-1">
+        <p class="font-bold">Media Ajar Bahasa Prancis A1 • Yona Gustria (2407348) • Débat & Opinion</p>
+        <p class="opacity-80">Palet Warna Earth Tone • Sponsorisé par le Programme MBG ?? & Planters de Sawit ?? (Sans Karhutla)</p>
+    </footer>
+
+    <script>
+        /* -------------------------------------------------------------
+           DATA FOR MATCHING GAME (A1 FRENCH OPINION / DEBATE)
+           Left: French A1 Phrase
+           Right: Function in French A1 (NO translation in answers!)
+        ------------------------------------------------------------- */
+        const matchData = [
+            { id: 1, french: "Je pense que...", matchId: 'A', targetText: "Exprimer une idée personnelle" },
+            { id: 2, french: "Je suis d'accord !", matchId: 'B', targetText: "Exprimer un accord positif" },
+            { id: 3, french: "Je ne suis pas d'accord", matchId: 'C', targetText: "Exprimer un désaccord" },
+            { id: 4, french: "Le discours du Président", matchId: 'D', targetText: "La parole officielle du chef" },
+            { id: 5, french: "Le repas MBG gratuit", matchId: 'E', targetText: "Le lait et la nourriture offerts" },
+            { id: 6, french: "Protéger la forêt", matchId: 'F', targetText: "Action contre le karhutla" }
+        ];
+
+        let leftItems = [...matchData];
+        
+        let rightItems = matchData.map(item => ({
+            matchId: item.matchId,
+            text: item.targetText
+        })).sort(() => Math.random() - 0.5);
+
+        let selectedLeft = null;
+        let selectedRight = null;
+        let matchedPairsCount = 0;
+
+        /* -------------------------------------------------------------
+           DATA FOR MINI QUIZ (EASY A1 FRENCH - NO TRANSLATIONS IN OPTIONS)
+        ------------------------------------------------------------- */
+        const quizQuestions = [
+            {
+                question: "1. Comment débuter son opinion dans un débat A1 ?",
+                options: [
+                    { text: "Je pense que le projet est bon !", correct: true },
+                    { text: "Bon appétit à tout le monde !", correct: false },
+                    { text: "Je m'appelle Pierre, au revoir !", correct: false }
+                ]
+            },
+            {
+                question: "2. Vous soutenez la distribution du lait MBG. Que dites-vous ?",
+                options: [
+                    { text: "Je suis totalement d'accord !", correct: true },
+                    { text: "Je ne veux pas dormir ce soir.", correct: false },
+                    { text: "La pluie tombe sur le village.", correct: false }
+                ]
+            },
+            {
+                question: "3. Le Président parle de la forêt et du Sawit. Quelle expression est correcte ?",
+                options: [
+                    { text: "C'est important : STOP au Karhutla !", correct: true },
+                    { text: "Le feu est très délicieux.", correct: false },
+                    { text: "Je vole sans avion dans la nuit.", correct: false }
+                ]
+            },
+            {
+                question: "4. À mon avis, le repas MBG gratuit est :",
+                options: [
+                    { text: "Une excellente idée pour les étudiants !", correct: true },
+                    { text: "Un stylo rouge sur la table.", correct: false },
+                    { text: "Un chat qui parle en espagnol.", correct: false }
+                ]
+            }
+        ];
+
+        let currentQuizIdx = 0;
+        let quizScore = 0;
+
+        window.onload = function() {
+            renderMatchingGame();
+            renderQuizQuestion();
+        };
+
+        function switchTab(tab) {
+            const btnMatch = document.getElementById('btn-tab-match');
+            const btnQuiz = document.getElementById('btn-tab-quiz');
+            const secMatch = document.getElementById('section-match');
+            const secQuiz = document.getElementById('section-quiz');
+
+            if (tab === 'match') {
+                secMatch.classList.remove('hidden');
+                secQuiz.classList.add('hidden');
+                btnMatch.className = "px-5 py-2.5 rounded-2xl font-bold text-xs md:text-sm bg-terracotta text-white shadow-md transition-all flex items-center gap-2";
+                btnQuiz.className = "px-5 py-2.5 rounded-2xl font-bold text-xs md:text-sm bg-earth-200 text-earth-800 hover:bg-earth-300 transition-all flex items-center gap-2";
+            } else {
+                secQuiz.classList.remove('hidden');
+                secMatch.classList.add('hidden');
+                btnQuiz.className = "px-5 py-2.5 rounded-2xl font-bold text-xs md:text-sm bg-terracotta text-white shadow-md transition-all flex items-center gap-2";
+                btnMatch.className = "px-5 py-2.5 rounded-2xl font-bold text-xs md:text-sm bg-earth-200 text-earth-800 hover:bg-earth-300 transition-all flex items-center gap-2";
+            }
+        }
+
+        function renderMatchingGame() {
+            const leftCol = document.getElementById('left-column');
+            const rightCol = document.getElementById('right-column');
+
+            leftCol.innerHTML = '';
+            rightCol.innerHTML = '';
+
+            leftItems.forEach(item => {
+                const btn = document.createElement('button');
+                btn.className = `card-match w-full text-left p-3.5 md:p-4 rounded-2xl bg-earth-50 border-2 border-earth-300 font-bold text-earth-900 shadow-sm flex items-center justify-between text-xs md:text-sm`;
+                btn.dataset.id = item.id;
+                btn.dataset.matchId = item.matchId;
+                btn.innerHTML = `
+                    <span>?? ${item.french}</span>
+                    <i class="fa-solid fa-chevron-right text-earth-400 text-xs"></i>
+                `;
+                btn.onclick = () => selectLeft(btn, item);
+                leftCol.appendChild(btn);
+            });
+
+            rightItems.forEach(item => {
+                const btn = document.createElement('button');
+                btn.className = `card-match w-full text-left p-3.5 md:p-4 rounded-2xl bg-earth-50 border-2 border-earth-300 font-medium text-earth-800 shadow-sm flex items-center justify-between text-xs md:text-sm`;
+                btn.dataset.matchId = item.matchId;
+                btn.innerHTML = `
+                    <span>?? ${item.text}</span>
+                    <i class="fa-solid fa-circle-dot text-earth-400 text-xs"></i>
+                `;
+                btn.onclick = () => selectRight(btn, item);
+                rightCol.appendChild(btn);
+            });
+        }
+
+        function selectLeft(element, item) {
+            if (element.classList.contains('card-matched')) return;
+
+            document.querySelectorAll('#left-column .card-match').forEach(el => {
+                if(!el.classList.contains('card-matched')) el.classList.remove('card-selected');
+            });
+
+            element.classList.add('card-selected');
+            selectedLeft = { element, item };
+
+            checkMatch();
+        }
+
+        function selectRight(element, item) {
+            if (element.classList.contains('card-matched')) return;
+
+            document.querySelectorAll('#right-column .card-match').forEach(el => {
+                if(!el.classList.contains('card-matched')) el.classList.remove('card-selected');
+            });
+
+            element.classList.add('card-selected');
+            selectedRight = { element, item };
+
+            checkMatch();
+        }
+
+        function checkMatch() {
+            if (!selectedLeft || !selectedRight) return;
+
+            const isCorrect = selectedLeft.item.matchId === selectedRight.item.matchId;
+
+            if (isCorrect) {
+                selectedLeft.element.classList.remove('card-selected');
+                selectedRight.element.classList.remove('card-selected');
+
+                selectedLeft.element.classList.add('card-matched');
+                selectedRight.element.classList.add('card-matched');
+
+                selectedLeft = null;
+                selectedRight = null;
+
+                matchedPairsCount++;
+                document.getElementById('match-score').innerText = matchedPairsCount;
+
+                triggerReaction(true);
+
+                if (matchedPairsCount === matchData.length) {
+                    document.getElementById('match-complete-msg').classList.remove('hidden');
+                }
+            } else {
+                const leftEl = selectedLeft.element;
+                const rightEl = selectedRight.element;
+
+                leftEl.classList.add('card-wrong');
+                rightEl.classList.add('card-wrong');
+
+                triggerReaction(false);
+
+                setTimeout(() => {
+                    leftEl.classList.remove('card-wrong', 'card-selected');
+                    rightEl.classList.remove('card-wrong', 'card-selected');
+                    selectedLeft = null;
+                    selectedRight = null;
+                }, 800);
+            }
+        }
+
+        function renderQuizQuestion() {
+            const q = quizQuestions[currentQuizIdx];
+            document.getElementById('quiz-progress').innerText = `${currentQuizIdx + 1} / ${quizQuestions.length}`;
+            document.getElementById('quiz-question').innerText = q.question;
+
+            const optsContainer = document.getElementById('quiz-options');
+            optsContainer.innerHTML = '';
+
+            const shuffledOpts = [...q.options].sort(() => Math.random() - 0.5);
+
+            shuffledOpts.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-3.5 md:p-4 rounded-2xl bg-earth-100 hover:bg-earth-200 border-2 border-earth-300 font-bold text-earth-900 transition-all shadow-sm text-xs md:text-sm flex items-center gap-2";
+                btn.innerText = opt.text;
+                btn.onclick = () => handleQuizAnswer(opt, btn);
+                optsContainer.appendChild(btn);
+            });
+        }
+
+        function handleQuizAnswer(option, btnElement) {
+            if (option.correct) {
+                btnElement.classList.remove('bg-earth-100');
+                btnElement.classList.add('bg-emerald-200', 'border-emerald-500');
+                quizScore++;
+                triggerReaction(true);
+            } else {
+                btnElement.classList.remove('bg-earth-100');
+                btnElement.classList.add('bg-red-200', 'border-red-500');
+                triggerReaction(false);
+            }
+
+            setTimeout(() => {
+                currentQuizIdx++;
+                if (currentQuizIdx < quizQuestions.length) {
+                    renderQuizQuestion();
+                } else {
+                    showFinalModal();
+                }
+            }, 1100);
+        }
+
+        function triggerReaction(isCorrect) {
+            const modal = document.getElementById('reaction-modal');
+            const correctDiv = document.getElementById('reaction-correct');
+            const wrongDiv = document.getElementById('reaction-wrong');
+
+            modal.classList.remove('hidden');
+
+            if (isCorrect) {
+                correctDiv.classList.remove('hidden');
+                wrongDiv.classList.add('hidden');
+                confetti({
+                    particleCount: 50,
+                    spread: 60,
+                    origin: { y: 0.7 },
+                    colors: ['#D96B43', '#6B8E23', '#A88B60']
+                });
+            } else {
+                wrongDiv.classList.remove('hidden');
+                correctDiv.classList.add('hidden');
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('reaction-modal').classList.add('hidden');
+        }
+
+        function showFinalModal() {
+            document.getElementById('final-modal').classList.remove('hidden');
+            confetti({
+                particleCount: 120,
+                spread: 100,
+                origin: { y: 0.5 }
+            });
+        }
+
+        function restartAll() {
+            document.getElementById('final-modal').classList.add('hidden');
+            matchedPairsCount = 0;
+            currentQuizIdx = 0;
+            quizScore = 0;
+            document.getElementById('match-score').innerText = '0';
+            document.getElementById('match-complete-msg').classList.add('hidden');
+            
+            rightItems = matchData.map(item => ({
+                matchId: item.matchId,
+                text: item.targetText
+            })).sort(() => Math.random() - 0.5);
+
+            renderMatchingGame();
+            renderQuizQuestion();
+            switchTab('match');
+        }
+    </script>
+</body>
+</html>
